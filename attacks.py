@@ -4,7 +4,7 @@ from utils import Interval
 from Cryptodome.PublicKey import RSA
 from Cryptodome.Util.number import bytes_to_long, long_to_bytes
 
-from PKCS1 import PKCS1, removePadding;
+from PKCS1 import PKCS1;
 
 # use only one cipher
 noOfBits = 1024
@@ -80,7 +80,7 @@ def checkIntervals(intervals: List[Interval]) -> bool:
 
 def handleMessageInt(initpaddedMsgBytes: bytes, messageInt: int):
   messageBytes: bytes = long_to_bytes(messageInt, noOfBits//8)
-  decodeMesBytes =  removePadding(messageBytes)
+  decodeMesBytes =  cipher.decode(messageBytes)
   print("Find messageBytes", messageBytes.hex(':'))
   print("Init message Bytes", initpaddedMsgBytes.hex(':'))
   print("Found message", decodeMesBytes.decode())
@@ -88,7 +88,6 @@ def handleMessageInt(initpaddedMsgBytes: bytes, messageInt: int):
 def attack():
   message = utils.getInputMessage()
   messageBytes = message.encode()
-  messageInt = bytes_to_long(messageBytes)
   paddedMsgBytes = cipher.encode(messageBytes)
 
   cipherTextBytes = cipher.encrypt(paddedMsgBytes)
