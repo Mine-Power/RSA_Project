@@ -1,5 +1,5 @@
 import RSA_Functions as rsa
-import math
+import attacks;
 
 def main():
     n, phi_n = rsa.input_n()
@@ -13,4 +13,5 @@ def main():
 
 
 if __name__ == "__main__":
-    main()
+    # main()
+    attacks.attack()
