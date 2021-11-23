@@ -8,7 +8,7 @@ def removePadding(paddedMsgBytes: bytes):
     if paddedMsgBytes[0:2] != b"\x00\x02":
         raise Exception("The padded message bytes are not valid!")
     else:
-        return paddedMsgBytes[idSecondZero+1:]
+        return paddedMsgBytes[idSecondZero + 1:]
 
 
 class PKCS1:
