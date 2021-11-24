@@ -1,4 +1,5 @@
 from Crypto.PublicKey import RSA
+from cryptography.hazmat.primitives.asymmetric import rsa
 from Crypto.Random import random
 from Crypto.Util.number import bytes_to_long, long_to_bytes
 
@@ -12,16 +13,16 @@ def removePadding(paddedMsgBytes: bytes):
 
 
 class PKCS1:
-    def __init__(self, rsaKey: RSA.RsaKey) -> None:
+    def __init__(self, rsaKey: rsa.RSAPrivateKey) -> None:
         self.rsaKey = rsaKey
 
-    def new(key: RSA.RsaKey):
+    def new(key: rsa.RSAPrivateKey):
         return PKCS1(key)
 
     def encode(self, msgBytes: bytes):
         rsaKey = self.rsaKey
         msgLength = len(msgBytes)
-        totalBytes = rsaKey.size_in_bytes()
+        totalBytes = rsaKey.key_size // 8
         if msgLength > totalBytes - 11:
             raise Exception("The message is too large for encoding!")
         padLength = totalBytes - msgLength - 3
@@ -34,17 +35,17 @@ class PKCS1:
 
     def encrypt(self, paddedMsgBytes: bytes):
         rsaKey = self.rsaKey
-        n = rsaKey.n
-        e = rsaKey.e
-        totalBytes = rsaKey.size_in_bytes()
+        n = rsaKey.public_key().public_numbers().n
+        e = rsaKey.public_key().public_numbers().e
+        totalBytes = rsaKey.key_size // 8
         paddedMsgInt = bytes_to_long(paddedMsgBytes)
         cipherInt = pow(paddedMsgInt, e, n)
         return long_to_bytes(cipherInt, totalBytes)
 
     def decrypt(self, cipherBytes: bytes):
         rsaKey = self.rsaKey
-        d = rsaKey.d
-        n = rsaKey.n
+        d = rsaKey.private_numbers().d
+        n = rsaKey.public_key().public_numbers().n
         cipherInt = bytes_to_long(cipherBytes)
         paddedMsgInt = pow(cipherInt, d, n)
-        return long_to_bytes(paddedMsgInt, rsaKey.size_in_bytes())
+        return long_to_bytes(paddedMsgInt, rsaKey.key_size // 8)

@@ -2,6 +2,7 @@ from typing import List
 import utils
 from utils import Interval
 from Crypto.PublicKey import RSA
+from cryptography.hazmat.primitives.asymmetric import rsa
 from Crypto.Util.number import bytes_to_long, long_to_bytes
 
 from PKCS1 import PKCS1
@@ -9,17 +10,20 @@ from PKCS1 import PKCS1
 # Use only one cipher
 
 class RSA_Attack():
-    noOfBits = 1024
+    noOfBits = 512
     B = int(pow(2, noOfBits - 8 * 2))
     mLowThresh = 2 * B
     mHighThresh = 3 * B - 1
     queries = 0
 
     def __init__(self):
-        self.rsa_key = RSA.generate(self.noOfBits)
+        self.rsa_key = rsa.generate_private_key(
+            public_exponent = 65537,
+            key_size = self.noOfBits,
+        )
         self.cipher = PKCS1.new(self.rsa_key)
-        self.n = self.rsa_key.n
-        self.e = self.rsa_key.e
+        self.n = self.rsa_key.public_key().public_numbers().n
+        self.e = self.rsa_key.public_key().public_numbers().e
 
 
     def canDecryptWithS(self, cipherInt: int, s: int):
