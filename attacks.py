@@ -1,7 +1,6 @@
 from typing import List
 import utils
 from utils import Interval
-from Crypto.PublicKey import RSA
 from cryptography.hazmat.primitives.asymmetric import rsa
 from Crypto.Util.number import bytes_to_long, long_to_bytes
 
@@ -15,6 +14,7 @@ class RSA_Attack():
     mLowThresh = 2 * B
     mHighThresh = 3 * B - 1
     queries = 0
+    sIndex = 2
 
     def __init__(self):
         self.rsa_key = rsa.generate_private_key(
@@ -29,7 +29,7 @@ class RSA_Attack():
     def canDecryptWithS(self, cipherInt: int, s: int):
         self.queries += 1
         if self.queries % 500 == 0:
-            print("Oracle query {q}; \n s is {s}".format(q = self.queries, s = s))
+            print("Oracle query {q}; \nTesting s{i}, value is: {s}".format(q = self.queries, i=self.sIndex, s = s))
         newCipherInt: int = cipherInt * pow(s, self.e, self.n) % self.n
         try:
             cipherBytes = long_to_bytes(newCipherInt)
@@ -52,14 +52,18 @@ class RSA_Attack():
         high = interval.high
         low = interval.low
         curR = utils.ceil(2 * (high * prevS - self.mLowThresh), self.n)
+        prevHighS = -1
 
         while True:
             lowS = utils.ceil(self.mLowThresh + curR * self.n, high)
             highS = utils.ceil(self.mHighThresh + 1 + curR * self.n, low)
+            if (prevHighS > lowS):
+              lowS = prevHighS + 1
             for s in range(lowS, highS):
                 if self.canDecryptWithS(cipherTextInt, s):
                     return s
             curR += 1
+            prevHighS = highS
 
 
     def searchS(self, intervals: List[Interval], cipherTextInt: int, prevS: int):
@@ -111,17 +115,14 @@ class RSA_Attack():
         intervals: List[Interval] = [Interval(self.mLowThresh, self.mHighThresh)]
 
         s = self.searchSmallestS(cipherTextInt, utils.ceil(self.n, self.mHighThresh + 1))
-        sIndex = 2
 
         while True:
             s = self.searchS(intervals, cipherTextInt, s)
             if s is None:
                 print("Error encountered while searching for S!")
                 break
-            else:
-                print("\ns{i}: {s}".format(i = sIndex, s = s))
             intervals = self.narrowIntervals(intervals, s)
             if self.checkIntervals(intervals):
                 self.handleMessageInt(paddedMsgBytes, intervals[0].low)
                 break
-            sIndex += 1
+            self.sIndex += 1
