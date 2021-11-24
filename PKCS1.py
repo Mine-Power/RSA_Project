@@ -1,4 +1,3 @@
-from Crypto.PublicKey import RSA
 from cryptography.hazmat.primitives.asymmetric import rsa
 from Crypto.Random import random
 from Crypto.Util.number import bytes_to_long, long_to_bytes
