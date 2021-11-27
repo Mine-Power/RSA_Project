@@ -9,6 +9,10 @@ def ceil(a, b):
     return a // b + (a % b > 0)
 
 
+def inversePrimeMod(p, q):
+    return pow(p, q - 2, q)
+
+
 def getInputMessage():
     return input("Input your message: ")
 
@@ -27,14 +31,14 @@ class Interval:
             raise ValueError("Low cannot be higher then high")
 
     def __repr__(self):
-        return "[{l} - {h}]".format(l = self.low, h = self.high)
+        return "[{l} - {h}]".format(l=self.low, h=self.high)
 
     def __str__(self) -> str:
-        return "[{l} - {h}]".format(l = self.low, h = self.high)
+        return "[{l} - {h}]".format(l=self.low, h=self.high)
 
 
 def mergeIntervals(intervals: List[Interval]) -> List[Interval]:
-    intervals.sort(key = lambda x: x.low)
+    intervals.sort(key=lambda x: x.low)
     merged: List[Interval] = []
     for interval in intervals:
         # If the list of merged intervals is empty, or if the current
