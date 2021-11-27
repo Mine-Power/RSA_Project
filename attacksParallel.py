@@ -32,7 +32,7 @@ printOracleQuery = printOracleQuery
 cpuNum = multiprocessing.cpu_count() // 2
 print("check cpu", cpuNum)
 
-parrallelBatchSize = 96
+parrallelBatchSize = 128
 
 
 def canDecryptWithSOneParams(s: int):
