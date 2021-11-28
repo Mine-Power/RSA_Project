@@ -3,7 +3,7 @@ import utils
 from utils import Interval
 from cryptography.hazmat.primitives.asymmetric import rsa
 from Crypto.Util.number import bytes_to_long, long_to_bytes
-
+import time
 from PKCS1 import PKCS1
 
 # Use only one cipher
@@ -32,12 +32,6 @@ class RSA_Attack:
 
     def canDecryptWithS(self, cipherInt: int, s: int):
         self.queries += 1
-        if self.queries % 500 == 0 and self.printOracleQuery:
-            print(
-                "Oracle query {q}; \nTesting s{i}, value is: {s}".format(
-                    q=self.queries, i=self.sIndex, s=s
-                )
-            )
         newCipherInt: int = cipherInt * pow(s, self.e, self.n) % self.n
         try:
             cipherBytes = long_to_bytes(newCipherInt)
@@ -109,8 +103,9 @@ class RSA_Attack:
             print("Exception when decode")
 
     def attack(self, messageBytes: bytes):
+        startTime = time.time()
         self.queries = 0
-        self.sIndex = 2
+        self.sIndex = 1
         paddedMsgBytes = self.cipher.encode(messageBytes)
 
         cipherTextBytes = self.cipher.encrypt(paddedMsgBytes)
@@ -121,19 +116,32 @@ class RSA_Attack:
         s = self.searchSmallestS(
             cipherTextInt, utils.ceil(self.n, self.mHighThresh + 1)
         )
+        print(
+            "Found s{i}, s is {s}, \ntotal queries {q}".format(
+                i=self.sIndex, s=s, q=self.queries
+            )
+        )
+        self.sIndex += 1
 
         while True:
             s = self.searchS(intervals, cipherTextInt, s)
             if s is None:
                 print("Error encountered while searching for S!")
                 break
+            else:
+                print(
+                    "Found s{i}, s is {s}, \ntotal queries {q}".format(
+                        i=self.sIndex, s=s, q=self.queries
+                    )
+                )
             intervals = self.narrowIntervals(intervals, s)
             if self.checkIntervals(intervals):
                 self.handleMessageInt(paddedMsgBytes, intervals[0].low)
                 break
             self.sIndex += 1
-        return self.queries
+        endTime = time.time()
+        return [self.queries, endTime - startTime]
 
     def perform_attack(self):
         message = utils.getInputMessage()
-        self.attack(message.encode())
+        return self.attack(message.encode())

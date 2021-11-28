@@ -1,13 +1,43 @@
 import attacks
 from attackStatistics import AttackStatistics
 import attacksParallel
+import time
+
 
 def main():
-    # rsa_attack = attacks.RSA_Attack(512, True)
-    # rsa_attack.perform_attack()
-    attacksParallel.perform_attack()
-    # atkStat = AttackStatistics()
-    # atkStat.oracleQueryStatistic(50, 512)
+    print(
+        "Enter your options to\
+        \n1 For perform an normal attacks\
+        \n2 Perform a parallel attacks\
+        \n3 Generate statistic information by performing multiple attakcs\
+    "
+    )
+    try:
+        userOptions = int(input("Please enter your options: \n"))
+        noOfBits = int(
+            input(
+                "Please enter the number of bits for modulus n (512 or 1024 or 2048): \n"
+            )
+        )
+        if userOptions == 1:
+            rsa_attack = attacks.RSA_Attack(noOfBits, True)
+            time = rsa_attack.perform_attack()[1]
+            print("Attack time: {t}".format(t=time))
+        elif userOptions == 2:
+            attacksParallel.init(noOfBits)
+            time = attacksParallel.perform_attack()[1]
+            print("Attack time: {t}".format(t=time))
+        elif userOptions == 3:
+            noOfIterations = int(
+                input("Please enter the number of iterations you want to run: \n")
+            )
+            atkStat = AttackStatistics()
+            atkStat.oracleQueryStatistic(noOfIterations, noOfBits)
+        else:
+            print("Unexpected input")
+    except:
+        print("There is an exception")
+
 
 if __name__ == "__main__":
     main()
