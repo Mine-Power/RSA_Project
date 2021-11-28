@@ -1,18 +1,19 @@
 # Bielencheier attack on PKC#1 V1.5
+
 ## Motivation
-We want to highlight that although strong RSA is secure, the weak implemenation can result in security issue.
+We want to highlight that although strong RSA is secure (with properly generated primes and exponent), weak implementations of the cipher can result in security issues.
 
-We choose the Bielencheier attack on PKCS1 V1.5 because this highlighted the weak use case of RSA protocol on a popular standard and lead to the improvement in the ways RSA is used.
+We chose the Bielencheier attack on PKCS1 V1.5 because this highlights a weak use case of the RSA protocol on a popular standard, which leads to improvements in the ways RSA is used.
 
-## PKCS1 V1.5 RSA block type 2
+## PKCS1 V1.5 - RSA block type 2
 
 The standard defined 3 block types and the attack focus on the **blocktype 2** for message encryption:
 
-* 00 | 02 | padding string || 00 || data blocks
+* 00 || 02 || padding string || 00 || data blocks
 * The padding string length is at least 8 blocks
 
 ## The attack
-In the Bleichenbacher attacks define that an **encryption block EB** is **PKCS conforming** if it can be parsed in the block 2 format above, i.e it is in this form
+In the Bleichenbacher attack, we define that an **encryption block EB** is **PKCS conforming** if it can be parsed into the block format above, i.e
 
 > EB = EB1 || EB2 || ... || EBk
 * EB1 = 00
@@ -20,48 +21,50 @@ In the Bleichenbacher attacks define that an **encryption block EB** is **PKCS c
 * EB3 to EB10 are non-zero
 * At least one of the bytes from EB11 through EBk is 00
 
-And the **cipher text c** of a PKCS conforming encryption block EB is **PKCS conforming**
+And the **cipher text c** of a PKCS conforming encryption block EB is **PKCS conforming** as well.
 
-With an **orcale** that allow attacker know **whether** a **cipher text** is **PKCS conforming** or not, he can do an **adaptive chosen cipher text attacks** to figure out the cipher text.
+With an **orcale** that allows the adversary to know whether a **cipher text** is **PKCS conforming** or not, he can do an **adaptive chosen cipher text attack** to figure out the cipher text.
 
-The number of **choosen cipher text** required is about **2^20**. The detailed proof is stated in the [Bleichenbacher's paper](http://archiv.infsec.ethz.ch/education/fs08/secsem/bleichenbacher98.pdf)
+The number of **chosen cipher texts** required is about **2^20**. The full proof is detailed in the [Bleichenbacher's paper](http://archiv.infsec.ethz.ch/education/fs08/secsem/bleichenbacher98.pdf)
 
 ## Access to the oracle
-There are situations that attacker can access to an oracle that enable the attacks, and here are some examples:
+There are situations that an attacker can hgain access to an oracle that enables the attacks - here are some examples:
 
 ### Plain encryption without integrity checks
 
-Assume if Alice can generate a message m and send to Bob with out any further integrity check, who will decrypt and send error if the message is NOT PKCS confroming. Eve can impersonate Alice and check the conformance
+We assume that Alice can generate a message m and send to Bob without any further integrity checks, who will decrypt and send back an error if the message is NOT **PKCS conforming**. Eve, the attacker, can impersonate Alice and check the conformance of her chosen cipher texts.
 
 ### Detailed Error 
-If the error message that stat if the message failure reason is PKCS conforming (e.g the error state that the message is not PKCS conforming or verification is failed), attacker can use the message as an orcale.
+If there is an error message indicating that the reason for message failure is **PKCS non-conformance**, an attacker can use the message as an orcale.
 
-### Timing attack:
-If there is differece in the time required to handle a NOT PKCS conforming and a PKCS conforming once, attacker can measure it and use as an oracle.
+### Timing attack
+If there is a difference in the time required to handle a **PKCS non-conforming** message and a **PKCS conforming** one, an attacker can measure it and use the timing as an oracle.
 
-E.g: for system simply check if the message is conforming or NOT before verify the signature, the time to handle a NOT PKCS conforming and a PKCS conforming cipher text will be different 
+E.g: For a hardware system, simply check if the message is conforming or NOT before verifying the signature. The time taken to handle a **PKCS non-conforming** cipher text and a **PKCS conforming** one will be different.
 
 # How to use
-## Requirement package
+
+## Requirement packages
 These packages are used in this project
 * pythoncrypto for secure RSA keys generation
-* pycryptodome for random generators and some other utilities functions
-* seaborn for graph drawing
-## Install
+* pycryptodome for random generators and some other utility functions
+* seaborn for graph drawing (used for statistics)
+
+## Installation
 Clone this repo. In the root directory, run this command:
 > pip install requirements.txt
 
-## Run the code
-Run the file main.py: The program will prompt three options for 3 use case.
+## Running the code
+Run the file main.py: The program will prompt three options for 3 use cases.
 
-1 Perform a normal attacks
-* User will be promt to enter a plain text, and the program will encode it using PKCS1# standard, then encrypt it and try to retrive the plain text from the cipher text.
+### Performing a normal attack
+* User will be prompted to enter a plain text, and the program will encode it using PKCS1# standard, then encrypt it. Afterward, it will attempt to retrive the plain text from the cipher text.
 
-2 Perform a attacks optimized by parrallel computing
-* Same as 1 except the attack is oprimized parrallel the oracle queries.
-* Note: half of the cores of the CPUS will be used.
+### Performing an attack optimized by parrallel computing
+* Same as the first use case, except the attack is optimized by parallelizing the oracle queries.
+* Note: half of the CPU cores available will be used.
 
-3 Run multiple attacks to perform statistics
-* This options is to show statistics information by running multiple attack on random PKCS conformation message.
-* The statistics information including number of oracle queries, running time of each attacks.
-* The program will use the optimzed attacks.
+### Performing multiple attacks to perform statistics
+* This option is to show statistics information by running multiple attacks on random **PKCS conforming** message.
+* The statistics include numbers of oracle queries and running time of each attack.
+* The program will use the optimized version of the attack.
