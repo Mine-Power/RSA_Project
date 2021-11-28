@@ -7,16 +7,16 @@ import time
 def main():
     print(
         "Enter your options to\
-        \n1 For perform an normal attacks\
-        \n2 Perform a parallel attacks\
-        \n3 Generate statistic information by performing multiple attakcs\
+        \n1 Perform an normal attack\
+        \n2 Perform a parallel attack\
+        \n3 Generate statistic information by performing multiple attacks\
     "
     )
     try:
-        userOptions = int(input("Please enter your options: \n"))
+        userOptions = int(input("Please enter your option: \n"))
         noOfBits = int(
             input(
-                "Please enter the number of bits for modulus n (512 or 1024 or 2048): \n"
+                "Please enter the number of bits for n (512 or 1024 or 2048): \n"
             )
         )
         if userOptions == 1:
