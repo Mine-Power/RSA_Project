@@ -1,4 +1,4 @@
-# Bielencheier attack on PKC#1 V1.5
+# Bielencheier attack on PKCS1 V1.5
 
 ## Motivation
 We want to highlight that although strong RSA is secure (with properly generated primes and exponent), weak implementations of the cipher can result in security issues.
