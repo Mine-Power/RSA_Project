@@ -16,7 +16,7 @@ useCipherInt = None
 
 class AttackObj:
     def __init__(self, noOfBits: int):
-        self.noOfBits = 512
+        self.noOfBits = noOfBits
         self.B = int(pow(2, noOfBits - 8 * 2))
         self.mLowThresh = 2 * self.B
         self.mHighThresh = 3 * self.B - 1
@@ -51,11 +51,9 @@ def canDecryptWithSOneParams(s: int):
         return False
 
 
-def searchSmallestS(cipherTextInt: int, lowerBound: int):
+def searchSmallestS(lowerBound: int):
     global queries
-    global useCipherInt
     parrallelBatchSize = attackObj.parrallelBatchSize
-    useCipherInt = cipherTextInt
     s = lowerBound
     index = 0
     pool = Pool(attackObj.cpuNum)
@@ -72,19 +70,17 @@ def searchSmallestS(cipherTextInt: int, lowerBound: int):
         index += 1
 
 
-def searchSOneInterval(interval: Interval, cipherTextInt: int, prevS: int):
+def searchSOneInterval(interval: Interval, prevS: int):
     global queries
     high = interval.high
     low = interval.low
     curR = utils.ceil(2 * (high * prevS - attackObj.mLowThresh), attackObj.n)
     prevHighS = -1
-    global useCipherInt
-    useCipherInt = cipherTextInt
     while True:
         lowS = utils.ceil(attackObj.mLowThresh + curR * attackObj.n, high)
         highS = utils.ceil(attackObj.mHighThresh + 1 + curR * attackObj.n, low)
         if prevHighS > lowS:
-            lowS = prevHighS + 1
+            lowS = prevHighS
         pool = Pool(attackObj.cpuNum)
         parrallelBatchSize = attackObj.oneIntervalBatchSize
         for baseS in range(lowS, highS, parrallelBatchSize):
@@ -154,16 +150,18 @@ def attack(messageBytes: bytes):
 
     cipherTextBytes = attackObj.cipher.encrypt(paddedMsgBytes)
     cipherTextInt = bytes_to_long(cipherTextBytes)
+    global useCipherInt
+    useCipherInt = cipherTextInt
 
     intervals: List[Interval] = [Interval(attackObj.mLowThresh, attackObj.mHighThresh)]
 
     s = searchSmallestS(
-        cipherTextInt, utils.ceil(attackObj.n, attackObj.mHighThresh + 1)
+        utils.ceil(attackObj.n, attackObj.mHighThresh + 1)
     )
     print("Found s{i}, s is {s}, \ntotal queries {q}".format(i=sIndex, s=s, q=queries))
     sIndex += 1
     while True:
-        s = searchS(intervals, cipherTextInt, s)
+        s = searchS(intervals, s)
         if s is None:
             print("Error encountered while searching for S!")
             break
