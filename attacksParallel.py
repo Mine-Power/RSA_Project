@@ -97,11 +97,11 @@ def searchSOneInterval(interval: Interval, prevS: int):
         prevHighS = highS
 
 
-def searchS(intervals: List[Interval], cipherTextInt: int, prevS: int):
+def searchS(intervals: List[Interval], prevS: int):
     if len(intervals) > 1:
-        return searchSmallestS(cipherTextInt, prevS + 1)
+        return searchSmallestS(prevS + 1)
     elif len(intervals) == 1:
-        return searchSOneInterval(intervals[0], cipherTextInt, prevS)
+        return searchSOneInterval(intervals[0], prevS)
     else:
         return None
 
