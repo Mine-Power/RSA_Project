@@ -1,6 +1,7 @@
 from cryptography.hazmat.primitives.asymmetric import rsa
 from Crypto.Random import random
 from Crypto.Util.number import bytes_to_long, long_to_bytes
+from utils import inversePrimeMod
 
 
 def removePadding(paddedMsgBytes: bytes):
@@ -14,6 +15,12 @@ def removePadding(paddedMsgBytes: bytes):
 class PKCS1:
     def __init__(self, rsaKey: rsa.RSAPrivateKey) -> None:
         self.rsaKey = rsaKey
+        self.n = rsaKey.public_key().public_numbers().n
+        self.p = rsaKey.private_numbers().p
+        self.q = rsaKey.private_numbers().q
+        self.e = rsaKey.public_key().public_numbers().e
+        self.d = rsaKey.private_numbers().d
+        self.u = inversePrimeMod(self.p, self.q)
 
     def new(key: rsa.RSAPrivateKey):
         return PKCS1(key)
@@ -34,17 +41,19 @@ class PKCS1:
 
     def encrypt(self, paddedMsgBytes: bytes):
         rsaKey = self.rsaKey
-        n = rsaKey.public_key().public_numbers().n
-        e = rsaKey.public_key().public_numbers().e
         totalBytes = rsaKey.key_size // 8
         paddedMsgInt = bytes_to_long(paddedMsgBytes)
-        cipherInt = pow(paddedMsgInt, e, n)
+        cipherInt = pow(paddedMsgInt, self.e, self.n)
         return long_to_bytes(cipherInt, totalBytes)
 
     def decrypt(self, cipherBytes: bytes):
         rsaKey = self.rsaKey
-        d = rsaKey.private_numbers().d
-        n = rsaKey.public_key().public_numbers().n
         cipherInt = bytes_to_long(cipherBytes)
-        paddedMsgInt = pow(cipherInt, d, n)
+
+        dp = self.d % (self.p - 1)
+        dq = self.d % (self.q - 1)
+        m1 = pow(cipherInt, dp, self.p)
+        m2 = pow(cipherInt, dq, self.q)
+        h = ((m2 - m1) * self.u) % self.q
+        paddedMsgInt = h * self.p + m1
         return long_to_bytes(paddedMsgInt, rsaKey.key_size // 8)

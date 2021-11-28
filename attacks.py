@@ -16,8 +16,11 @@ class RSA_Attack:
     mHighThresh = 3 * B - 1
     queries = 0
     sIndex = 2
+    printOracleQuery = False
 
-    def __init__(self):
+    def __init__(self, noOfBits: int, printOracleQuery: bool):
+        if noOfBits:
+            self.noOfBits = noOfBits
         self.rsa_key = rsa.generate_private_key(
             public_exponent=65537,
             key_size=self.noOfBits,
@@ -25,10 +28,11 @@ class RSA_Attack:
         self.cipher = PKCS1.new(self.rsa_key)
         self.n = self.rsa_key.public_key().public_numbers().n
         self.e = self.rsa_key.public_key().public_numbers().e
+        self.printOracleQuery = printOracleQuery
 
     def canDecryptWithS(self, cipherInt: int, s: int):
         self.queries += 1
-        if self.queries % 500 == 0:
+        if self.queries % 500 == 0 and self.printOracleQuery:
             print(
                 "Oracle query {q}; \nTesting s{i}, value is: {s}".format(
                     q=self.queries, i=self.sIndex, s=s
@@ -99,11 +103,14 @@ class RSA_Attack:
         decodeMesBytes = self.cipher.decode(messageBytes)
         print("Find messageBytes", messageBytes.hex(":"))
         print("Init message Bytes", initpaddedMsgBytes.hex(":"))
-        print("Found message", decodeMesBytes.decode())
+        try:
+            print("Found message", decodeMesBytes.decode())
+        except Exception:
+            print("Exception when decode")
 
-    def perform_attack(self):
-        message = utils.getInputMessage()
-        messageBytes = message.encode()
+    def attack(self, messageBytes: bytes):
+        self.queries = 0
+        self.sIndex = 2
         paddedMsgBytes = self.cipher.encode(messageBytes)
 
         cipherTextBytes = self.cipher.encrypt(paddedMsgBytes)
@@ -125,3 +132,8 @@ class RSA_Attack:
                 self.handleMessageInt(paddedMsgBytes, intervals[0].low)
                 break
             self.sIndex += 1
+        return self.queries
+
+    def perform_attack(self):
+        message = utils.getInputMessage()
+        self.attack(message.encode())
