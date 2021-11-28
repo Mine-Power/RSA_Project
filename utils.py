@@ -27,7 +27,7 @@ class Interval:
             self.low = low
             self.high = high
         else:
-            print("Low higher than high: [{l} - {h}]".format(l=low, h=high))
+            print("Low higher than high: [{l} - {h}]".format(l = low, h = high))
             raise ValueError("Low cannot be higher then high")
 
     def __repr__(self):
@@ -38,7 +38,7 @@ class Interval:
 
 
 def mergeIntervals(intervals: List[Interval]) -> List[Interval]:
-    intervals.sort(key=lambda x: x.low)
+    intervals.sort(key = lambda x: x.low)
     merged: List[Interval] = []
     for interval in intervals:
         # If the list of merged intervals is empty, or if the current
