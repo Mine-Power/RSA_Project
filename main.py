@@ -12,31 +12,28 @@ def main():
         \n3 Generate statistic information by performing multiple attacks\
     "
     )
-    try:
-        userOptions = int(input("Please enter your option: \n"))
-        noOfBits = int(
-            input(
-                "Please enter the number of bits for n (512 or 1024 or 2048): \n"
-            )
+    userOptions = int(input("Please enter your option: \n"))
+    noOfBits = int(
+        input(
+            "Please enter the number of bits for n (512 or 1024 or 2048): \n"
         )
-        if userOptions == 1:
-            rsa_attack = attacks.RSA_Attack(noOfBits, True)
-            time = rsa_attack.perform_attack()[1]
-            print("Attack time: {t}".format(t=time))
-        elif userOptions == 2:
-            attacksParallel.init(noOfBits)
-            time = attacksParallel.perform_attack()[1]
-            print("Attack time: {t}".format(t=time))
-        elif userOptions == 3:
-            noOfIterations = int(
-                input("Please enter the number of iterations you want to run: \n")
-            )
-            atkStat = AttackStatistics()
-            atkStat.oracleQueryStatistic(noOfIterations, noOfBits)
-        else:
-            print("Unexpected input")
-    except:
-        print("There is an exception")
+    )
+    if userOptions == 1:
+        rsa_attack = attacks.RSA_Attack(noOfBits, True)
+        time = rsa_attack.perform_attack()[1]
+        print("Attack time: {t}".format(t=time))
+    elif userOptions == 2:
+        attacksParallel.init(noOfBits)
+        time = attacksParallel.perform_attack()[1]
+        print("Attack time: {t}".format(t=time))
+    elif userOptions == 3:
+        noOfIterations = int(
+            input("Please enter the number of iterations you want to run: \n")
+        )
+        atkStat = AttackStatistics()
+        atkStat.oracleQueryStatistic(noOfIterations, noOfBits)
+    else:
+        print("Unexpected input")
 
 
 if __name__ == "__main__":
