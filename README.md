@@ -21,11 +21,11 @@ In the Bleichenbacher attack, we define that an **encryption block EB** is **PKC
 * EB3 to EB10 are non-zero
 * At least one of the bytes from EB11 through EBk is 00
 
-And the **cipher text c** of a PKCS conforming encryption block EB is **PKCS conforming** as well.
+And the cipher text c of a PKCS conforming encryption block EB is **PKCS conforming** as well.
 
-With an **orcale** that allows the adversary to know whether a **cipher text** is **PKCS conforming** or not, he can do an **adaptive chosen cipher text attack** to figure out the cipher text.
+With an **orcale** that allows the adversary to know whether a cipher text is **PKCS conforming** or not, he can do an **adaptive chosen cipher text attack** to figure out the cipher text.
 
-The number of **chosen cipher texts** required is about **2^20**. The full proof is detailed in the [Bleichenbacher's paper](http://archiv.infsec.ethz.ch/education/fs08/secsem/bleichenbacher98.pdf)
+The number of **chosen cipher texts** required is about **2^20**. The full proof is detailed in the [Bleichenbacher's paper](http://archiv.infsec.ethz.ch/education/fs08/secsem/bleichenbacher98.pdf).
 
 ## Access to the oracle
 There are situations that an attacker can hgain access to an oracle that enables the attacks - here are some examples:
@@ -65,6 +65,6 @@ Run the file main.py: The program will prompt three options for 3 use cases.
 * Note: half of the CPU cores available will be used.
 
 ### Performing multiple attacks to perform statistics
-* This option is to show statistics information by running multiple attacks on random **PKCS conforming** message.
+* This option is to show statistics information by running multiple attacks on random **PKCS conforming** messages.
 * The statistics include numbers of oracle queries and running time of each attack.
 * The program will use the optimized version of the attack.
