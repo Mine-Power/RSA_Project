@@ -7,9 +7,9 @@ import time
 def main():
     print(
         "Enter your options to\
-        \n1 For perform an normal attacks\
-        \n2 Perform a parallel attacks\
-        \n3 Generate statistic information by performing multiple attakcs\
+        \n1 Perform an normal attack\
+        \n2 Perform a parallel attack\
+        \n3 Generate statistic information by performing multiple attacks\
     "
     )
     userOptions = int(input("Please enter your options: \n"))

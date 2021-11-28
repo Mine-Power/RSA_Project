@@ -10,19 +10,16 @@ from PKCS1 import PKCS1
 
 
 class RSA_Attack:
-    noOfBits = 512
-    B = int(pow(2, noOfBits - 8 * 2))
-    mLowThresh = 2 * B
-    mHighThresh = 3 * B - 1
-    queries = 0
-    sIndex = 2
-    printOracleQuery = False
 
     def __init__(self, noOfBits: int, printOracleQuery: bool):
-        if noOfBits:
-            self.noOfBits = noOfBits
+        self.noOfBits = noOfBits
+        self.B = int(pow(2, noOfBits - 8 * 2))
+        self.mLowThresh = 2 * self.B
+        self.mHighThresh = 3 * self.B - 1
+        self.queries = 0
+        self.sIndex = 2
         self.rsa_key = rsa.generate_private_key(
-            public_exponent=65537,
+            public_exponent = 65537,
             key_size=self.noOfBits,
         )
         self.cipher = PKCS1.new(self.rsa_key)
@@ -58,7 +55,7 @@ class RSA_Attack:
             lowS = utils.ceil(self.mLowThresh + curR * self.n, high)
             highS = utils.ceil(self.mHighThresh + 1 + curR * self.n, low)
             if prevHighS > lowS:
-                lowS = prevHighS + 1
+                lowS = prevHighS
             for s in range(lowS, highS):
                 if self.canDecryptWithS(cipherTextInt, s):
                     return s
@@ -131,7 +128,7 @@ class RSA_Attack:
             else:
                 print(
                     "Found s{i}, s is {s}, \ntotal queries {q}".format(
-                        i=self.sIndex, s=s, q=self.queries
+                        i = self.sIndex, s = s, q = self.queries
                     )
                 )
             intervals = self.narrowIntervals(intervals, s)
